@@ -32,10 +32,17 @@ module.exports.fetch = function *fetch(id) {
 
 module.exports.create = function *create() {
   const message = yield parse(this);
-  console.log(this);
+  console.log("Your Message");
+  console.log(message);
   const id = messages.push(message) - 1;
   message.id = id;
   this.redirect('/');
+};
+
+module.exports.bodyFn = function *getBody(){
+  const req_body = parse(this);
+  console.log(req_body);
+  this.body = yield req_body;
 };
 
 const asyncOperation = () => callback =>
