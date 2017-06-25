@@ -12,6 +12,7 @@ const md5 = require('md5');
 const crypto = require('crypto');
 const async = require('async');
 const exec = require('exec');
+const Cryptr = require('Cryptr')
 
 //Database Imports
 const dbModels = require('./dbInjector').dataModels;
@@ -38,16 +39,28 @@ module.exports.signIn = function  *signIn(){
 
 module.exports.create = function* (){
 
-  var input = parse(this);
+  var input = yield parse(this);
   console.log(input);
 
-  var newDocument = new User(input);
-  newDocument.save(function *(data){
-    console.log(data);
-    this.body = yield data;
+  User.find({ $or: [{name: input.name}, {email: input.email}]}).exec(function (err,data){
+
+    if(err){
+      console.log(err);
+    }else if(data){
+      console.log("Data found");
+      console.log(data);
+    }
+
   });
 
-  // this.body = yield {message: "Data Inserted"};
+  console.log("Creating user");
+  var newDocument = new User(input);
+  newDocument.save(function(data){
+    console.log(data);
+    // this.body = yield data;
+  });
+
+  this.body = yield {message: "Data Inserted"};
 
 };
 
@@ -60,3 +73,9 @@ var generateToken = function() {
 function hashPassword(password) {
   return md5(password);
 }
+
+//Response generator.
+function *loadResponse(json){
+  this.body = yield json;
+}
+
