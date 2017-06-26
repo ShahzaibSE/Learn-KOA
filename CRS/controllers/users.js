@@ -42,26 +42,30 @@ module.exports.create = function* (){
   var input = yield parse(this);
   console.log(input);
 
-  User.find({ $or: [{name: input.name}, {email: input.email}]}).exec(function (err,data){
+  User.find({ $or: [{name: input.name}, {email: input.email}]}).exec(function* (err,data){
 
     if(err){
       console.log(err);
     }else if(data){
       console.log("Data found");
       console.log(data);
+    }else if(!data){
+      console.log("Creating user");
+      var newDocument = new User(input);
+      newDocument.save(function(data){
+        console.log(data);
+        // this.body = yield data;
+      });
+
+      this.body = yield {message: "Data Inserted"};
     }
 
   });
 
-  console.log("Creating user");
-  var newDocument = new User(input);
-  newDocument.save(function(data){
-    console.log(data);
-    // this.body = yield data;
-  });
+};
 
-  this.body = yield {message: "Data Inserted"};
-
+module.exports.userList = function* (){
+  this.body = yield User.find();
 };
 
 var generateToken = function() {

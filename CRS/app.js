@@ -8,6 +8,8 @@ const route = require('koa-route');
 const koa = require('koa');
 const path = require('path');
 const mongoose = require('mongoose');
+const koa_mongoose = require('koa-mongoose');
+
 const app = module.exports = koa();
 
 //Mongodb Connection
@@ -25,6 +27,25 @@ app.use(route.get('/async', messages.delay));
 app.use(route.get('/promise', messages.promise));
 app.use(route.post('/user/signIn',user.signIn));
 app.use(route.post('/user/create',user.create));
+app.use(route.get('/user/list',user.userList));
+
+//Mongoose middleware
+// app.use(mongoose({
+//   username: '',
+//   password: '',
+//   host: '127.0.0.1',
+//   port: 27017,
+//   database: ctx => {
+//     return ctx.headers['x-app']
+//   },
+//   schemas: './models/schema',
+//   db: {
+//     native_parser: true
+//   },
+//   server: {
+//     poolSize: 5
+//   }
+// }))
 
 // Serve static files
 app.use(serve(path.join(__dirname, 'public')));
