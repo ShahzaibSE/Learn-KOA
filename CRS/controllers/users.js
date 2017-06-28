@@ -12,14 +12,14 @@ const md5 = require('md5');
 const crypto = require('crypto');
 const async = require('async');
 const exec = require('exec');
-const Cryptr = require('Cryptr')
+const crypt = require('./cryptology');
 
 //Database Imports
 const dbModels = require('./dbInjector').dataModels;
 const User = dbModels.user;
 const Role = dbModels.role;
 
-module.exports.signIn = function  *signIn(){
+module.exports.signIn = function  *(){
   var req_body = parse(this);
   User.findOne({ email:this.email, password: this.password }).then(function(err,data){
 
@@ -37,35 +37,43 @@ module.exports.signIn = function  *signIn(){
 
 };
 
-module.exports.create = function* (){
+module.exports.create = function *(){
 
-  var input = yield parse(this);
+  var body = yield parse(this);
   console.log(input);
 
-  User.find({ $or: [{name: input.name}, {email: input.email}]}).exec(function* (err,data){
+  var _password = null;
+  if(body.confirm_password === body.password){
+    _password = body.password;
+  }else if(body.confirm_password !== body.password){  //In case of wrong password
+    this.body = yield { status: false, resCode: 400, isError: true, message: "Please enter the password again" }
+    return;  //Code will break here.
+  }
 
-    if(err){
-      console.log(err);
-    }else if(data){
-      console.log("Data found");
-      console.log(data);
-    }else if(!data){
-      console.log("Creating user");
-      var newDocument = new User(input);
-      newDocument.save(function(data){
-        console.log(data);
-        // this.body = yield data;
-      });
+  var input = {
+    firstname: body.firstname,
+    lastname: body.lastname,
+    email: body.email,
+    password: crypt.encrypt(_password),
+    createdAt: new Date().getDate(),
+    isActive: body.isActive
+  };
+  console.log("User Input");
+  console.log(input);
 
-      this.body = yield {message: "Data Inserted"};
-    }
+  var newUser = new User(input); //New User.
 
-  });
+  var queried_user =  yield User.findOne({email: input.email});  //Looking for duplicated user.
+  if(queried_user){
+    this.body = { status: true, resCode: 203, isError: false, message: "User already created" };
+  }else{
+    this.body = { status: true, resCode: 200, isError: false, message: "User created successfully", data: newUser.save() };
+  }
 
 };
 
-module.exports.userList = function* (){
-  this.body = yield User.find();
+module.exports.userList = function *(){
+  this.body = { status: true, resCode: 200, isError: false, message: "Users found successfully", data: yield User.find() };
 };
 
 var generateToken = function() {

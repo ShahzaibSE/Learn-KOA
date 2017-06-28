@@ -43,7 +43,7 @@ exports.company = function() {
 exports.roles = function ()
 {
   var roles = mongoose.Schema({
-    id :Schema.ObjectId,
+    id: Schema.ObjectId,
     name: String,
     createdAt: Date,
     updatedAt: Date,
@@ -55,13 +55,15 @@ exports.users = function ()
 {
   var users = mongoose.Schema({
     id :Schema.ObjectId,
-    name: String,
+    firstname: String,
+    lastname: String,
     email: String,
     password: String,
     roleId: [],
     devices: [],
     sessionId: String,
     isActive: Boolean,
+    createdAt: Date
   });
   return mongoose.model('users', users);
 }

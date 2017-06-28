@@ -18,6 +18,7 @@ mongoose.connect('mongodb://localhost/CRS');
 // Logger
 app.use(logger());
 
+// | ------------------------ Routes ------------------------ |
 app.use(route.get('/', messages.home));
 app.use(route.get('/messages', messages.list));
 app.use(route.get('/messages/:id', messages.fetch));
@@ -28,6 +29,7 @@ app.use(route.get('/promise', messages.promise));
 app.use(route.post('/user/signIn',user.signIn));
 app.use(route.post('/user/create',user.create));
 app.use(route.get('/user/list',user.userList));
+// | -------------------------------------------------------- |
 
 //Mongoose middleware
 // app.use(mongoose({
@@ -54,6 +56,6 @@ app.use(serve(path.join(__dirname, 'public')));
 app.use(compress());
 
 if (!module.parent) {
-  app.listen(3000);
-  console.log('listening on port 3000');
+  app.listen(3003);
+  console.log('listening on port 3003');
 }
