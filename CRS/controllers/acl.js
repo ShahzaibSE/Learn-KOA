@@ -9,6 +9,7 @@ const path = require('path');
 const dbModels = require('./dbInjector').dataModels;
 const user = dbModels.user;
 
-exports.authinticaton = function(ctx,next){
-  await next();
+exports.authinticaton = function (req,res,next){
+  console.log("Authorization Middleware");
+  next();
 };

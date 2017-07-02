@@ -1,6 +1,8 @@
 'use strict';
 const messages = require('./controllers/messages');
 const user = require('./controllers/users');
+const roles = require('./controllers/roles');
+
 const compress = require('koa-compress');
 const logger = require('koa-logger');
 const serve = require('koa-static');
@@ -9,11 +11,19 @@ const koa = require('koa');
 const path = require('path');
 const mongoose = require('mongoose');
 const koa_mongoose = require('koa-mongoose');
+const acl = require('./controllers/acl');
 
 const app = module.exports = koa();
 
 //Mongodb Connection
 mongoose.connect('mongodb://localhost/CRS');
+
+mongoose.connection.on('connected',function(){
+  console.log("Mongodb connection up now");
+});
+mongoose.connection.on('error',function(){
+  console.log("Mongodb connection error occured while conecting");
+});
 
 // Logger
 app.use(logger());

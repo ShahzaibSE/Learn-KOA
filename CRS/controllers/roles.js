@@ -12,10 +12,10 @@ const dbModels = require('./dbInjector').dataModels;
 const Role = dbModels.role;
 
 module.exports.add = function *(){
-   
+
    //Request Body.
    var body = yield parse(this);
-   
+
    //Looking for existing roles
    var existing_roles_list = yield Role.find({});
 
@@ -44,10 +44,10 @@ module.exports.update = function *(){
     var finding_role = yield Role.findOne({ name: body.name.toLowerCase() });
 
     if(finding_role){ //Updating role
-        var { _id } = finding_role; 
+        var { _id } = finding_role;
         yield Role.update({ _id: _id  },{ $set: {name: body.name, updatedAt: new Date().getDate()} });
         this.body = yield { status: true, resCode: 200, isError: false, message: "Data updated successfully" };
-    }else if(!finding_role){ 
+    }else if(!finding_role){
         this.body = { status: false, resCode: 404, isError: true, message: "Data not found" };
     }
 
@@ -55,8 +55,39 @@ module.exports.update = function *(){
 
 module.exports.delete = function *(){
 
+  var body = yield parse(this);
+
+  var searchedRole = yield Role.remove({name: body.name.toLowerCase()});
+
+  if(searchedRole.nRemoved > 0){
+    this.body = { status: true, resCode: 200, isError: false, message: "Data removed successfully" };
+  }else if(searchedRole.nRemoved == 0){
+    this.body = { status: false, resCode: 400, isError: false, message: "Data not found" };
+  }
+
 };
 
 module.exports.selectall = function *(){
+
+  var body = yield parse(this);
+
+  var AllRoles = yield Role.find();
+
+  if(AllRoles){
+    this.body = {
+      status: true,
+      resCode: 200,
+      isError: false,
+      message: "Data found successfully",
+      data: AllRoles
+    };
+  }else if(AllRoles == []){
+    this.body = {
+      status: true,
+      resCode: 200,
+      isError: false,
+      message: "Data does not exist"
+    };
+  }
 
 };
