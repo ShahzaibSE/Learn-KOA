@@ -81,7 +81,7 @@ module.exports.selectall = function *(){
       message: "Data found successfully",
       data: AllRoles
     };
-  }else if(AllRoles == []){
+  }else if(AllRoles === []){
     this.body = {
       status: true,
       resCode: 200,
